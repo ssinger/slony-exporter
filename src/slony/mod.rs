@@ -1,5 +1,5 @@
 use postgres::{Client, NoTls};
-use std::collections::HashSet;
+
 
 pub struct SlonyStatus {
     //The node id of this node.
@@ -119,7 +119,7 @@ fn query(url: &str) -> Result<SlonyStatus, Error> {
     let slony_status = fetch_node_incoming(&mut client, &slony_schema, slony_status)?;
 
     //Connection leak on error?
-    client.close();
+    let _r = client.close();
     return Ok(slony_status);
 }
 
@@ -170,7 +170,7 @@ fn fetch_node_confirmations(
     let confirm_rows = client.query(query.as_str(), &[&slony_status.node_id()])?;
     let mut confirms: Vec<SlonyConfirm> = vec![];
     for row in confirm_rows {
-        let mut confirm = SlonyConfirm {
+        let confirm = SlonyConfirm {
             receiver: row.get(0),
             last_confirmed_event: row.get(1),
             last_confirmed_timestamp: row.get(2),

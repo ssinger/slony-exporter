@@ -2,9 +2,8 @@ mod metrics;
 mod slony;
 use crate::slony::ErrorTrait;
 use metrics::Metrics;
-use prometheus::{Counter, Encoder, Opts, Registry, TextEncoder};
-use slony::{SlonyConfirm, SlonyStatus};
-use tokio::prelude::*;
+use prometheus::{Encoder, TextEncoder};
+use slony::{SlonyStatus};
 
 use std::convert::Infallible;
 
@@ -20,7 +19,7 @@ lazy_static! {
     static ref METRICS: Metrics = Metrics::new();
 }
 
-async fn metric(r: Request<Body>) -> Result<Response<Body>, Infallible> {
+async fn metric(_r: Request<Body>) -> Result<Response<Body>, Infallible> {
     let r = slony::fetch_slony_status();
     if let Ok(ref slony) = r {
         metric_for_connection(slony, &METRICS);
@@ -43,14 +42,14 @@ pub async fn main() {
     let addr = ([127, 0, 0, 1], 3000).into();
     let server = Server::bind(&addr).serve(make_svc);
 
-    server.await;
+    let _r  = server.await;
 }
 
 /**
  * Creates metrics for each slony node pair.
  *
  */
-fn render(slony_status: SlonyStatus) -> String {
+fn render(_slony_status: SlonyStatus) -> String {
     let mut buffer = vec![];
     let encoder = TextEncoder::new();
     let metric_family = prometheus::gather();

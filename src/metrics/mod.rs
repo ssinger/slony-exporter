@@ -1,4 +1,4 @@
-use prometheus::{Counter, Encoder, IntGaugeVec, Opts, Registry, TextEncoder};
+use prometheus::{IntGaugeVec, Opts};
 
 pub struct Metrics {
     last_event: IntGaugeVec,
