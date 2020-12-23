@@ -1,0 +1,31 @@
+[package]
+name = "slony-exporter"
+version = "0.1.0"
+authors = ["ssinger"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+prometheus="0.9.0"
+
+pretty_env_logger = "0.4"
+
+
+[dependencies.hyper]
+version= "0.13.9"
+features=["default"]
+
+[dependencies.tokio]
+version="0.2.11"
+features=['full']
+
+[dependencies.postgres]
+version="0.18.1"
+
+
+[dependencies.openssl]
+version="0.10.28"
+
+[dependencies.lazy_static]
+version="1.4.0"
