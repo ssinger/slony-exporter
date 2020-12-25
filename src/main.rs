@@ -103,15 +103,15 @@ fn metric_for_connection(slony_connection: &SlonyStatus, metrics: &Metrics) {
         metrics
             .last_received_event()
             .with_label_values(&[
-                &format!("{}", slony_connection.node_id()),
                 &format!("{}", incoming.origin),
+                &format!("{}", slony_connection.node_id())
             ])
             .set(incoming.last_event_id);
         metrics
             .last_received_event_timestamp()
             .with_label_values(&[
-                &format!("{}", slony_connection.node_id()),
                 &format!("{}", incoming.origin),
+                &format!("{}", slony_connection.node_id())
             ])
             .set(incoming.last_event_timestamp);
     }
