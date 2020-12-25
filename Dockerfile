@@ -10,4 +10,5 @@ EXPOSE 9090
 ENV PORT 9090
 ENV SLONY_CLUSTER=test
 ENV POSTGRES_URL=postgresq://postgres@localhost:5432/test
+USER nobody
 ENTRYPOINT /slony-exporter
