@@ -91,8 +91,8 @@ impl From<ErrorStack> for Error {
     }
 }
 
-fn connect(url: &str,tlsConnector: MakeTlsConnector) -> Result<postgres::Client, postgres::Error> {    
-    Client::connect(url, tlsConnector)
+fn connect(url: &str,tls_connector: MakeTlsConnector) -> Result<postgres::Client, postgres::Error> {    
+    Client::connect(url, tls_connector)
 }
 
 pub fn fetch_slony_status() -> Result<SlonyStatus, Error> {
@@ -121,7 +121,7 @@ fn query(url: &str) -> Result<SlonyStatus, Error> {
         }
     };
 
-    let mut sslbuilder = SslConnector::builder(SslMethod::tls())?;
+    let sslbuilder = SslConnector::builder(SslMethod::tls())?;
     let tls_connector = MakeTlsConnector::new(sslbuilder.build());
     let mut client = connect(url,tls_connector)?;
 
