@@ -29,3 +29,6 @@ version="0.10.28"
 
 [dependencies.lazy_static]
 version="1.4.0"
+
+[dependencies.postgres-openssl]
+verison="0.4.0"

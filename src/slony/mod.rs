@@ -1,4 +1,9 @@
-use postgres::{Client, NoTls};
+use postgres::{Client};
+use postgres_openssl::MakeTlsConnector;
+use openssl::ssl::{SslConnector,SslMethod};
+use openssl::error::ErrorStack;
+
+
 
 
 pub struct SlonyStatus {
@@ -78,8 +83,16 @@ impl From<postgres::Error> for Error {
     }
 }
 
-fn connect(url: &str) -> Result<postgres::Client, postgres::Error> {
-    Client::connect(url, NoTls)
+impl From<ErrorStack> for Error {
+    fn from(error: ErrorStack) -> Self {
+        Error {
+            message: String::from(format!("SSL error: {} ",error))
+        }
+    }
+}
+
+fn connect(url: &str,tlsConnector: MakeTlsConnector) -> Result<postgres::Client, postgres::Error> {    
+    Client::connect(url, tlsConnector)
 }
 
 pub fn fetch_slony_status() -> Result<SlonyStatus, Error> {
@@ -108,7 +121,9 @@ fn query(url: &str) -> Result<SlonyStatus, Error> {
         }
     };
 
-    let mut client = connect(url)?;
+    let mut sslbuilder = SslConnector::builder(SslMethod::tls())?;
+    let tls_connector = MakeTlsConnector::new(sslbuilder.build());
+    let mut client = connect(url,tls_connector)?;
 
     // Fetch information about this node from sl_status.
     let slony_status = fetch_node_data(&mut client, &slony_schema)?;
