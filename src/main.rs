@@ -39,7 +39,18 @@ pub async fn main() {
     let make_svc = make_service_fn(|_conn| async {
         Ok::<_, Infallible>(service_fn(|request| metric(request)))
     });
-    let addr = ([127, 0, 0, 1], 3000).into();
+
+    let port_string = match std::env::var("PORT") {
+        Ok(p)=> p,
+        Err(_e)=> "9090".to_string()
+    };
+
+    let port = match u16::from_str_radix(&port_string,10) {
+        Ok(v) => v,
+        Err(e)=> { panic!("Invalid port {}",e); }
+    };
+    
+    let addr = ([127, 0, 0, 1], port).into();
     let server = Server::bind(&addr).serve(make_svc);
 
     let _r  = server.await;
