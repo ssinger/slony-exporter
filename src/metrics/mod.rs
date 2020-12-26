@@ -7,6 +7,7 @@ pub struct Metrics {
     last_confirmed_event_timestamp: IntGaugeVec,
     last_received_event: IntGaugeVec,
     last_received_event_timestamp: IntGaugeVec,
+    origin_sets: IntGaugeVec
 }
 
 impl Metrics {
@@ -27,6 +28,9 @@ impl Metrics {
     }
     pub fn last_received_event_timestamp(&self) -> &IntGaugeVec {
         &self.last_received_event_timestamp
+    }
+    pub fn origin_sets(&self)->&IntGaugeVec {
+        &self.origin_sets
     }
     pub fn new() -> Metrics {
         let opts = Opts::new("slony_confirmed_event", "The last event replicated");
@@ -63,6 +67,12 @@ impl Metrics {
         let last_received_event_timestamp =
             register_int_gauge_vec!(opts, &["slony_origin", "slony_receiver"]).unwrap();
 
+
+        let opts = Opts::new(
+            "slony_origin_sets",
+            "The replication sets which have the given origin."
+        );
+        let origin_sets = register_int_gauge_vec!(opts,&["slony_origin","slony_set"]).unwrap();
         Metrics {
             last_confirmed_event: last_confirmed_event,
             last_event: last_event,
@@ -70,6 +80,7 @@ impl Metrics {
             last_confirmed_event_timestamp: last_confirmed_event_timestamp,
             last_received_event: last_received_event,
             last_received_event_timestamp: last_received_event_timestamp,
+            origin_sets: origin_sets
         }
     }
 }

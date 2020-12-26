@@ -115,4 +115,11 @@ fn metric_for_connection(slony_connection: &SlonyStatus, metrics: &Metrics) {
             ])
             .set(incoming.last_event_timestamp);
     }
+
+    for set in slony_connection.origin_sets() {
+        metrics.origin_sets().with_label_values(&[
+            &format!("{}",slony_connection.node_id()),
+            &format!("{}",set)]).set(1)
+                                                 
+    }
 }

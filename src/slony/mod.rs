@@ -2,7 +2,7 @@ use postgres::{Client};
 use postgres_openssl::MakeTlsConnector;
 use openssl::ssl::{SslConnector,SslMethod};
 use openssl::error::ErrorStack;
-
+use std::collections::{HashSet};
 
 
 
@@ -14,6 +14,8 @@ pub struct SlonyStatus {
     // The last event generated on this node
     last_event_id: i64,
     last_event_timestamp: i64,
+    //Sets that this node is the origin for
+    origin_sets: HashSet<i32>
 }
 
 pub struct SlonyConfirm {
@@ -42,6 +44,7 @@ impl SlonyStatus {
             last_event_timestamp: last_event_timestamp,
             confirms: vec![],
             incoming: vec![],
+            origin_sets: HashSet::new()
         }
     }
     pub fn node_id(&self) -> i32 {
@@ -58,6 +61,9 @@ impl SlonyStatus {
     }
     pub fn incoming(&self) -> &Vec<SlonyIncoming> {
         &self.incoming
+    }
+    pub fn origin_sets(&self) -> &HashSet<i32> {
+        &self.origin_sets
     }
 }
 
@@ -133,6 +139,8 @@ fn query(url: &str) -> Result<SlonyStatus, Error> {
 
     let slony_status = fetch_node_incoming(&mut client, &slony_schema, slony_status)?;
 
+    let slony_status = fetch_sets(&mut client, &slony_schema, slony_status)?;
+    
     //Connection leak on error?
     let _r = client.close();
     return Ok(slony_status);
@@ -230,6 +238,26 @@ fn fetch_node_incoming(
     }
     slony_status.incoming = incoming;
     Ok(slony_status)
+}
+
+
+
+fn fetch_sets(
+    client: &mut Client,
+    slony_schema: &str,
+    mut slony_status: SlonyStatus,
+) -> Result<SlonyStatus, Error> {
+
+    let query = format!("select set_id from _{}.sl_set where set_origin=$1",
+                        slony_schema);
+    let rows = client.query(query.as_str(),&[&slony_status.node_id()])?;
+    let mut sets : HashSet<i32> = HashSet::new();
+    for row in rows {
+        sets.insert(row.get(0));
+    }
+    slony_status.origin_sets=sets;
+    Ok(slony_status)
+    
 }
 #[cfg(test)]
 mod tests {
