@@ -39,9 +39,9 @@ pub struct SlonyIncoming {
 impl SlonyStatus {
     pub fn new(node_id: i32, last_event_id: i64, last_event_timestamp: i64) -> SlonyStatus {
         SlonyStatus {
-            node_id: node_id,
-            last_event_id: last_event_id,
-            last_event_timestamp: last_event_timestamp,
+            node_id,
+            last_event_id,
+            last_event_timestamp,
             confirms: vec![],
             incoming: vec![],
             origin_sets: HashSet::new()
@@ -92,7 +92,7 @@ impl From<postgres::Error> for Error {
 impl From<ErrorStack> for Error {
     fn from(error: ErrorStack) -> Self {
         Error {
-            message: String::from(format!("SSL error: {} ",error))
+            message: format!("SSL error: {} ",error)
         }
     }
 }
@@ -112,8 +112,7 @@ pub fn fetch_slony_status() -> Result<SlonyStatus, Error> {
         }
     };
 
-    let query_result = query(&url);
-    query_result
+    query(&url)
 }
 
 fn query(url: &str) -> Result<SlonyStatus, Error> {
@@ -143,7 +142,7 @@ fn query(url: &str) -> Result<SlonyStatus, Error> {
     
     //Connection leak on error?
     let _r = client.close();
-    return Ok(slony_status);
+    Ok(slony_status)
 }
 
 fn fetch_node_data(client: &mut Client, slony_schema: &str) -> Result<SlonyStatus, Error> {
@@ -161,13 +160,13 @@ fn fetch_node_data(client: &mut Client, slony_schema: &str) -> Result<SlonyStatu
         slony_schema, slony_schema
     );
     let event_rows = client.query(query.as_str(), &[&format!("_{}", slony_schema)])?;
-    for row in event_rows {
+    if let Some(row) = event_rows.get(0) {
         return Ok(SlonyStatus::new(row.get(0), row.get(1), row.get(2)));
-    } //for
+    }
 
-    return Err(Error {
+    Err(Error {
         message: String::from("No events found"),
-    });
+    })
 }
 
 fn fetch_node_confirmations(

@@ -36,9 +36,10 @@ async fn metric(_r: Request<Body>) -> Result<Response<Body>, Infallible> {
 #[tokio::main]
 pub async fn main() {
     METRICS.last_event();
-    let make_svc = make_service_fn(|_conn| async {
-        Ok::<_, Infallible>(service_fn(|request| metric(request)))
-    });
+    let make_svc = make_service_fn(|_conn| async  {
+        Ok::<_, Infallible>(service_fn(metric))
+    }
+    );
 
     let port_string = match std::env::var("PORT") {
         Ok(p)=> p,

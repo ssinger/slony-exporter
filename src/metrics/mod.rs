@@ -74,13 +74,13 @@ impl Metrics {
         );
         let origin_sets = register_int_gauge_vec!(opts,&["slony_origin","slony_set"]).unwrap();
         Metrics {
-            last_confirmed_event: last_confirmed_event,
-            last_event: last_event,
-            last_event_timestamp: last_event_timestamp,
-            last_confirmed_event_timestamp: last_confirmed_event_timestamp,
-            last_received_event: last_received_event,
-            last_received_event_timestamp: last_received_event_timestamp,
-            origin_sets: origin_sets
+            last_confirmed_event,
+            last_event,
+            last_event_timestamp,
+            last_confirmed_event_timestamp,
+            last_received_event,
+            last_received_event_timestamp,
+            origin_sets
         }
     }
 }
