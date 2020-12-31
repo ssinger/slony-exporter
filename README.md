@@ -1,6 +1,6 @@
 # Slony Exporter
 
-Promtheus exporter for a [Slony](https://www.slony.info) node
+Prometheus exporter for a [Slony](https://www.slony.info) node
 
 ## Usage
 
